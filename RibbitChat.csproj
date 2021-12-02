@@ -2,4 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="Engine.fsproj" />
+  </ItemGroup>
 </Project>
