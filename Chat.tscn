@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Chat.cs" type="Script" id=1]
+[ext_resource path="res://HUD.cs" type="Script" id=2]
+
+[node name="ChatWindow" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+
+[node name="ChatDisplay" type="TextEdit" parent="."]
+margin_left = 64.0
+margin_top = 222.0
+margin_right = 940.0
+margin_bottom = 428.0
+readonly = true
+
+[node name="UserInput" type="LineEdit" parent="."]
+margin_left = 65.0
+margin_top = 428.0
+margin_right = 942.0
+margin_bottom = 465.0
+
+[node name="HUD" type="Panel" parent="."]
+margin_right = 1016.0
+margin_bottom = 219.0
+script = ExtResource( 2 )
