@@ -57,20 +57,25 @@ type ChatWindow() =
             | Some userInput ->
                 let txt = userInput.Text
                 userInput.Text <- ""
+                let (|OptionalColor|_|) = function
+                    | Word(color, End) -> Some (Some color)
+                    | End -> Some None
+                    | _ -> None
+                    
                 let (|CircleArgs|_|) = function
-                    | Str "circle" End -> Some(None, None, None)
-                    | Str "circle" (Int (radius, End)) -> Some(None, None, Some(single radius))
-                    | Str "circle" (Int (x, Int(y, End))) -> Some(Some(single x), Some(single y), None)
-                    | Str "circle" (Int (x, Int(y, Int(radius, End)))) -> Some(Some(single x), Some(single y), None)
+                    | Str "circle" (OptionalColor color) -> Some(None, None, None, color)
+                    | Str "circle" (Int (radius, (OptionalColor color))) -> Some(None, None, Some(single radius), color)
+                    | Str "circle" (Int (x, Int(y, (OptionalColor color)))) -> Some(Some(single x), Some(single y), None, color)
+                    | Str "circle" (Int (x, Int(y, Int(radius, (OptionalColor color))))) -> Some(Some(single x), Some(single y), None, color)
                     | _ -> None
 
-                let circle (x,y,radius) = function
+                let circle (x,y,radius,color) = function
                     | Some (hud: ShapePanel) ->
                         let sz = hud.RectSize
-                        hud.AddShape(Circle { origin = Vector2(defaultArg x (rand.Randf() * sz.x), defaultArg y (rand.Randf() * sz.y)); radius = 1f<godotLengthUnit> * defaultArg radius (rand.Randf() * 50f); color = Color.ColorN("blue") })
+                        hud.AddShape(Circle { origin = Vector2(defaultArg x (rand.Randf() * sz.x), defaultArg y (rand.Randf() * sz.y)); radius = 1f<godotLengthUnit> * defaultArg radius (rand.Randf() * 50f); color = Color.ColorN(defaultArg color "blue") })
                     | None -> ()
                 match txt |> ParseArgs.Init with 
-                | CircleArgs(x,y,radius) -> self |> lookup<ShapePanel> "HUD" |> circle(x,y,radius)
+                | CircleArgs(x,y,radius,color) -> self |> lookup<ShapePanel> "HUD" |> circle(x,y,radius,color)
                 | _ ->
                     (self |> lookup<TextEdit> "ChatDisplay") |> ifPresent (fun chatDisplay ->
                         chatDisplay.Text <- chatDisplay.Text + txt + "\n")
