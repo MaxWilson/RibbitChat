@@ -63,7 +63,7 @@ type ChatWindow() =
                     | _ -> None
                     
                 let (|CircleArgs|_|) = function
-                    | Str "circle" (Int (x, Int(y, Int(radius, (OptionalColor color))))) -> Some(Some(single x), Some(single y), None, color)
+                    | Str "circle" (Int (x, Int(y, Int(radius, (OptionalColor color))))) -> Some(Some(single x), Some(single y), Some (single radius), color)
                     | Str "circle" (Int (x, Int(y, (OptionalColor color)))) -> Some(Some(single x), Some(single y), None, color)
                     | Str "circle" (Int (radius, (OptionalColor color))) -> Some(None, None, Some(single radius), color)
                     | Str "circle" (OptionalColor color) -> Some(None, None, None, color)
