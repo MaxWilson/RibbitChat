@@ -97,10 +97,36 @@ type ChatWindow() =
                     let circle (x,y,radius,color) = function
                         | Some (hud: ShapePanel) ->
                             let sz = hud.RectSize
-                            hud.AddShape(Circle { origin = Vector2(defaultArg x (rand.Randf() * sz.x), defaultArg y (rand.Randf() * sz.y)); radius = 1f<godotLengthUnit> * defaultArg radius (rand.Randf() * 50f); color = Color.ColorN(defaultArg color "blue") })
+                            hud.AddShape(Circle { origin = Vector2(defaultArg x (rand.Randf() * sz.x), defaultArg y (rand.Randf() * sz.y)); radius = 1f<godotLengthUnit> * defaultArg radius (rand.Randf() * 100f); color = Color.ColorN(defaultArg color "blue") })
                         | None -> ()
+                    let rect (x,y,h,w,color) = function
+                        | Some (hud: ShapePanel) ->
+                            let sz = hud.RectSize
+                            hud.AddShape(Rect { origin = Vector2(defaultArg x (rand.Randf() * sz.x), defaultArg y (rand.Randf() * sz.y)); height = 1f<godotLengthUnit> * defaultArg h (rand.Randf() * 100f); width = 1f<godotLengthUnit> * defaultArg w (rand.Randf() * 100f); color = Color.ColorN(defaultArg color "blue") })
+                        | None -> ()
+                    let changeAll f =
+                        self |> lookup<ShapePanel> "HUD" |> function
+                        | Some panel ->
+                            panel.Shapes <- panel.Shapes |> List.map f
+                            panel.Update()
+                        | None -> ()                                    
+                    let moveOrigin f =
+                        changeAll (function
+                        | Circle c -> Circle { c with origin = f c.origin }
+                        | Rect r -> Rect { r with origin = f r.origin })
+                    let changeSize f =
+                        changeAll (function
+                        | Circle c -> Circle { c with radius = f c.radius }
+                        | Rect r -> Rect { r with height = r.height |> f; width = r.width |> f })
                     match txt |> ParseArgs.Init with
                     | CircleArgs(x,y,radius,color) -> self |> lookup<ShapePanel> "HUD" |> circle(x,y,radius,color)
+                    | Str "rect" (OptionalColor color) -> self |> lookup<ShapePanel> "HUD" |> rect(None, None, None, None, color)
+                    | Str "left" End -> moveOrigin(fun xy -> Vector2(xy.x-10f, xy.y))
+                    | Str "right" End -> moveOrigin(fun xy -> Vector2(xy.x+10f, xy.y))
+                    | Str "up" End -> moveOrigin(fun xy -> Vector2(xy.x, xy.y-10f))
+                    | Str "down" End -> moveOrigin(fun xy -> Vector2(xy.x, xy.y+10f))
+                    | Str "bigger" End -> changeSize ((*) 1.5f)
+                    | Str "smaller" End -> changeSize ((*) 0.7f)
                     | _ ->
                         lookupAction<TextEdit> self "ChatDisplay" <| fun chatDisplay ->
                             chatDisplay.Text <- chatDisplay.Text + txt + "\n"
