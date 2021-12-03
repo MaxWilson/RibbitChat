@@ -19,7 +19,7 @@ type ShapePanel() =
     inherit Panel()
     member val Shapes = [] with get, set
     override self._Draw() =
-        for x in self.Shapes do
+        for x in self.Shapes |> List.rev do
             match x with
             | Circle c -> 
                 self.DrawCircle(c.origin, c.radius * godotLengthInverse, c.color)
